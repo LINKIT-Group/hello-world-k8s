@@ -2,7 +2,8 @@ machine:
   environment:
     VERSION: 0.1
     TAG: $CIRCLE_BUILD_NUM
-
+    KUBE_PATH: ~/.kube/
+    KUBECONFIG: ~/.kube/config
   services:
     - docker
   pre:
@@ -10,6 +11,18 @@ machine:
 
   services:
     - docker
+
+dependencies:
+  pre:
+
+
+  override:
+  - curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+  - chmod +x kubectl
+  - mkdir -p $KUBE_PATH
+  - openssl aes-256-cbc -d -in k8s/kubeconfig.enc -k $KEY > $KUBECONFIG
+  - ./kubectl get pods
+
 
 test:
   override:
@@ -20,5 +33,6 @@ deployment:
     branch: master
     commands:
     - docker login -u $DOCKER_USER -p $DOCKER_PASS      
-    - docker push gianrubio/hello-world:$VERSION.$CIRCLE_BUILD_NUM    
-          
+    - docker push gianrubio/hello-world:$VERSION.$CIRCLE_BUILD_NUM  
+    - kubectl set image -n development deployment/hello-world hello=gianrubio/hello-world:$VERSION.$CIRCLE_BUILD_NUM
+    - kubectl rollout status -n development deployment/hello-world
