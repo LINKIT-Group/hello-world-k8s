@@ -32,7 +32,7 @@ deployment:
   production:
     branch: master
     commands:
-    - docker login -u $DOCKER_USER -p $DOCKER_PASS      
+    - docker login -u $DOCKER_USER -p $DOCKER_PASS -e $DOCKER_EMAIL
     - docker push gianrubio/hello-world:$VERSION.$CIRCLE_BUILD_NUM  
-    - kubectl set image -n development deployment/hello-world hello=gianrubio/hello-world:$VERSION.$CIRCLE_BUILD_NUM
-    - kubectl rollout status -n development deployment/hello-world
+    - ./kubectl set image -n development deployment/hello-world hello=gianrubio/hello-world:$VERSION.$CIRCLE_BUILD_NUM
+    - ./kubectl rollout status -n development deployment/hello-world
