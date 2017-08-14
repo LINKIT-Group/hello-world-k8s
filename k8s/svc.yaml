@@ -5,6 +5,8 @@ metadata:
   labels:
     app: hello-world
 spec:
+  selector:
+    app: hello-world
   ports:
   - port: 8000
     protocol: TCP
